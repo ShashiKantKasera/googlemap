@@ -1,0 +1,293 @@
+﻿<!DOCTYPE html>
+<!-- Template by quackit.com -->
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>KOnu-VMax</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/proj4@2.10.0/dist/proj4.min.js"></script>
+
+
+    <style type="text/css">
+        header {
+            background: #ffffff;
+            height: 80px;
+            background-image: url(images/Header.jpg);
+            background-repeat: no-repeat;
+            background-position: center;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            padding-top: 15px;
+        }
+
+        footer {
+            height: 50px;
+            background-image: url(images/Header.jpg);
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 100%;
+
+            text-align: center;
+            padding: 4px 0;
+
+        }
+
+        .innertube {
+            margin: 15px;
+            /* Padding for content */
+            font-family: Arial, Helvetica, sans-serif;
+            color: #ffffff;
+            margin-top: 0;
+
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            margin: 0 auto;
+            background-color: black;
+            align-content: center;
+            vertical-align: middle;
+        }
+
+        #map {
+            height: 80%;
+        }
+
+        /* Define a CSS class and apply it to the button */
+        .styledButton {
+            background-color: #007BFF;
+            /* Blue background */
+            color: white;
+            /* White text color */
+            padding: 10px 20px;
+            /* Padding around the text */
+            border: none;
+            /* No border */
+            border-radius: 5px;
+            /* Rounded corners */
+            cursor: pointer;
+            /* Cursor style on hover */
+        }
+
+        .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            /* Set the height to 100% of the viewport height for vertical centering */
+        }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script>
+        var map, cachedGeoJson, propertyLayer, parcelLayer, metroLayer, metroLineLayer;
+
+        // const proj4 = require('proj4');
+
+        // Define the projection systems for UTM and WGS84
+        proj4.defs([
+            ['EPSG:32600', '+proj=utm +zone=00 +datum=WGS84 +units=m +no_defs'],
+            ['EPSG:4326', '+proj=longlat +datum=WGS84 +no_defs']
+        ]);
+
+
+
+
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 17.4401, lng: 78.3489 },
+                zoom: 13,
+                mapTypeControl: true,
+                mapTypeControlOptions: {
+                    style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                    position: google.maps.ControlPosition.TOP_CENTER
+                },
+                zoomControl: true,
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.LEFT_CENTER
+                },
+                scaleControl: true,
+                // streetViewControl: true,
+                // streetViewControlOptions: {
+                //     position: google.maps.ControlPosition.LEFT_TOP
+                // },
+                fullscreenControl: true,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+
+
+            //drawing tool
+
+
+
+
+
+
+            //drawing
+            const drawingManager = new google.maps.drawing.DrawingManager({
+                drawingMode: google.maps.drawing.OverlayType.MARKER,
+                drawingControl: true,
+                drawingControlOptions: {
+                    position: google.maps.ControlPosition.TOP_CENTER,
+                    drawingModes: [
+                        google.maps.drawing.OverlayType.MARKER,
+                        google.maps.drawing.OverlayType.CIRCLE,
+                        google.maps.drawing.OverlayType.POLYGON,
+                        google.maps.drawing.OverlayType.POLYLINE,
+                        google.maps.drawing.OverlayType.RECTANGLE,
+                    ],
+                },
+                markerOptions: {
+                    icon: "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png",
+                },
+                circleOptions: {
+                    fillColor: "#ffff00",
+                    fillOpacity: 1,
+                    strokeWeight: 5,
+                    clickable: false,
+                    editable: true,
+                    zIndex: 1,
+                },
+            });
+
+            drawingManager.setMap(map);
+
+
+
+        }
+
+
+        function propertyGeoJson() {
+            if (propertyLayer && propertyLayer.setMap) {
+                propertyLayer.setMap(null);
+                propertyLayer = null;
+            } else {
+                //var geojson_URL = 'http://localhost:8085/geoserver/vmaxkonu/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vmaxkonu%3Aproperty&maxFeatures=50&outputFormat=application%2Fjson';
+                var geojson_URL = './data/property.geojson';
+                propertyLayer = new google.maps.Data();
+                propertyLayer.loadGeoJson(geojson_URL);
+                propertyLayer.setMap(map);
+
+                // Add click event listener to open info window
+                propertyLayer.addListener('click', function (event) {
+                    var infoWindow = new google.maps.InfoWindow({
+                        content: 'Property Info' // You can customize the content here
+                    });
+                    infoWindow.setPosition(event.latLng);
+                    infoWindow.open(map);
+                });
+            }
+        }
+
+        function parcelGeoJson() {
+            if (parcelLayer && parcelLayer.setMap) {
+                parcelLayer.setMap(null);
+                parcelLayer = null;
+            } else {
+                var geojson_URL1 = './data/parcel.geojson';
+                parcelLayer = new google.maps.Data();
+                parcelLayer.loadGeoJson(geojson_URL1);
+                parcelLayer.setMap(map);
+
+                // Add click event listener to open info window
+                parcelLayer.addListener('click', function (event) {
+                    var infoWindow = new google.maps.InfoWindow({
+                        content: 'Parcel Info' // You can customize the content here
+                    });
+                    infoWindow.setPosition(event.latLng);
+                    infoWindow.open(map);
+                });
+            }
+        }
+
+        function metroGeoJson() {
+            if (metroLayer && metroLayer.setMap) {
+                metroLayer.setMap(null);
+                metroLayer = null;
+            } else {
+                var geojson_URL2 = './data/metrolocation.geojson';
+                metroLayer = new google.maps.Data();
+                metroLayer.loadGeoJson(geojson_URL2, null, function (features) {
+                    metroLayer.setStyle(function (feature) {
+                        return {
+                            icon: {
+                                url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png' // Change the URL to the desired marker icon
+                            }
+                        };
+                    });
+                });
+                metroLayer.setMap(map);
+
+                // Add click event listener to open info window
+                metroLayer.addListener('click', function (event) {
+                    var infoWindow = new google.maps.InfoWindow({
+                        content: 'Metro Location Info' // You can customize the content here
+                    });
+                    infoWindow.setPosition(event.latLng);
+                    infoWindow.open(map);
+                });
+            }
+        }
+
+        function metroLineGeoJson() {
+            if (metroLineLayer && metroLineLayer.setMap) {
+                metroLineLayer.setMap(null);
+                metroLineLayer = null;
+            } else {
+                var geojson_URL3 = './data/metroproposedline.geojson';
+                metroLineLayer = new google.maps.Data();
+                metroLineLayer.loadGeoJson(geojson_URL3);
+                metroLineLayer.setMap(map);
+
+                // Add click event listener to open info window
+                metroLineLayer.addListener('click', function (event) {
+                    var infoWindow = new google.maps.InfoWindow({
+                        content: 'Metro Proposed Line Info' // You can customize the content here
+                    });
+                    infoWindow.setPosition(event.latLng);
+                    infoWindow.open(map);
+                });
+            }
+        }
+
+
+
+    </script>
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"
+        async defer></script> -->
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAm9ekbF8SnmFeUH4BvEffHYu_TuUieoDw&callback=initMap&libraries=drawing&libraries=visualization&v=weekly"
+        defer></script>
+
+</head>
+
+<body>
+    <header>
+        <div class="innertube">
+            <h1>Konu Vmax</h1>
+        </div>
+    </header>
+    <div class="center-container">
+        <button onclick="propertyGeoJson()" class="styledButton">Property</button>
+        <button onclick="parcelGeoJson()" class="styledButton">Parcel</button>
+        <button onclick="metroGeoJson()" class="styledButton">MetroLocation </button>
+        <button onclick="metroLineGeoJson()" class="styledButton">MetroProposedLine </button>
+        <!-- <button onclick="styleSelectedcountry()" class="styledButton">Style Clicked Country</button> -->
+    </div>
+    <div id="map">
+
+        <div id="mapDiv"></div>
+    </div>
+
+
+</body>
+
+</html>
