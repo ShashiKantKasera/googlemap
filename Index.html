@@ -170,7 +170,7 @@
                 propertyLayer = null;
             } else {
                 //var geojson_URL = 'http://localhost:8085/geoserver/vmaxkonu/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=vmaxkonu%3Aproperty&maxFeatures=50&outputFormat=application%2Fjson';
-                var geojson_URL = './data/property.geojson';
+                var geojson_URL = 'property.geojson';
                 propertyLayer = new google.maps.Data();
                 propertyLayer.loadGeoJson(geojson_URL);
                 propertyLayer.setMap(map);
@@ -191,7 +191,7 @@
                 parcelLayer.setMap(null);
                 parcelLayer = null;
             } else {
-                var geojson_URL1 = './data/parcel.geojson';
+                var geojson_URL1 = 'parcel.geojson';
                 parcelLayer = new google.maps.Data();
                 parcelLayer.loadGeoJson(geojson_URL1);
                 parcelLayer.setMap(map);
@@ -212,7 +212,7 @@
                 metroLayer.setMap(null);
                 metroLayer = null;
             } else {
-                var geojson_URL2 = './data/metrolocation.geojson';
+                var geojson_URL2 = 'metrolocation.geojson';
                 metroLayer = new google.maps.Data();
                 metroLayer.loadGeoJson(geojson_URL2, null, function (features) {
                     metroLayer.setStyle(function (feature) {
@@ -241,7 +241,7 @@
                 metroLineLayer.setMap(null);
                 metroLineLayer = null;
             } else {
-                var geojson_URL3 = './data/metroproposedline.geojson';
+                var geojson_URL3 = 'metroproposedline.geojson';
                 metroLineLayer = new google.maps.Data();
                 metroLineLayer.loadGeoJson(geojson_URL3);
                 metroLineLayer.setMap(map);
